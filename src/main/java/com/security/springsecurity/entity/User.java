@@ -16,7 +16,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                '}';
+                '}'+"\n";
     }
 
     public int getId() {
