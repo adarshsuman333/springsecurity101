@@ -3,9 +3,11 @@ package com.security.springsecurity.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -61,7 +63,10 @@ public class SecurityConfig {
         //Builder pattern
         return httpSecurity
                 .csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("register", "login")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
@@ -91,7 +96,7 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
 
 //        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 //        return provider;
@@ -111,10 +116,14 @@ public class SecurityConfig {
 
         //That's where we have to think about layers. Now, we have a service layer. Service says I want to get some data and the data should be coming from the database. The data will be provided to us by repository. So, that means if we want this to fetch the data, we need a repo layer. We have repo layer and there already exists a repository.
 
-        // In JPA, we define interface for the repo, and it will give us all the methods. So, in the repository layer/package, we have created a UserRepo interface. This repo extends the JpaRepository. And if we want to have repository, we will have to add two dependencies in our pom.xml file. One dependency will be for JPA and one will be for database, MySQL in our case.
-
+        // In JPA, we define interface for the repo, and it will give us all the methods. So, in the repository layer/package, we have created a UserRepo interface. This repo extends the JpaRepository. And if we want to have repository, we will have to add two dependencies in our pom.xml
         provider.setUserDetailsService(userDetailsService);
-        return provider;
+        return  provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
+        return config.getAuthenticationManager();
     }
 
 }
